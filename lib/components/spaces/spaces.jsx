@@ -8,7 +8,7 @@ export { spacesStyles as styles } from '../../styles/components/spaces/spaces'
 
 export const Component = ({ output, SIP, displayIndex }) => {
   if (!output) return <div className="spaces-display spaces-display--empty" />
-  const { spaces, windows } = output
+  const { spaces, windows, recentSpace } = output
   const { displayStickyWindowsSeparately } = Settings.get().spacesDisplay
   const displays = [...new Set(spaces.map((space) => space.display))]
   const SIPDisabled = SIP !== 'System Integrity Protection status: enabled.'
@@ -31,6 +31,7 @@ export const Component = ({ output, SIP, displayIndex }) => {
               space={space}
               windows={windows}
               displayIndex={displayIndex}
+              recent={recentSpace === space.index}
               SIPDisabled={SIPDisabled}
               lastOfSpace={lastOfSpace}
             />

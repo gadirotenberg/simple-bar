@@ -10,6 +10,8 @@ if [ -z "$SPACES" ]; then
   SPACES=$($YABAI_PATH -m query --spaces)
 fi
 
+RECENT_SPACE=$(cat /tmp/recent-space)
+
 if [ -z "$WINDOWS" ]; then
   WINDOWS=$($YABAI_PATH -m query --windows | sed 's/inf/0/g; s/\\.//g; s/\n//g')
 fi
@@ -28,7 +30,7 @@ $YABAI_PATH -m signal --add event=window_title_changed action="osascript -e 'tel
 
 echo $(cat <<-EOF
   {
-    "spaces": { "spaces": $SPACES, "windows": $WINDOWS },
+    "spaces": { "spaces": $SPACES, "windows": $WINDOWS, "recentSpace": $RECENT_SPACE },
     "displays": $DISPLAYS,
     "SIP": "$SIP",
     "shadow": "$SHADOW"

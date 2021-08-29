@@ -7,7 +7,7 @@ import * as Settings from '../../settings'
 
 const settings = Settings.get()
 
-const Space = ({ space, display, windows, displayIndex, SIPDisabled, lastOfSpace }) => {
+const Space = ({ space, display, windows, displayIndex, recent, SIPDisabled, lastOfSpace }) => {
   const labelRef = Uebersicht.React.useRef()
   const [hovered, setHovered] = Uebersicht.React.useState(false)
   const [noDelay, setNoDelay] = Uebersicht.React.useState(false)
@@ -74,10 +74,11 @@ const Space = ({ space, display, windows, displayIndex, SIPDisabled, lastOfSpace
   )
   const allApps = [...apps, ...stickyWindows]
 
-  if (!focused && !visible && !allApps.length && spacesDisplay.hideEmptySpaces) return null
+  if (!recent && !focused && !visible && !allApps.length && spacesDisplay.hideEmptySpaces) return null
 
   const classes = Utils.classnames(`space space--${type}`, {
     'space--focused': focused === 1,
+    'space--recent': recent,
     'space--visible': visible === 1,
     'space--fullscreen': fullscreen === 1,
     'space--hovered': hovered,
