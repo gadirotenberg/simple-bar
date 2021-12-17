@@ -53,6 +53,21 @@ const Item = ({ code, Component, defaultValue, label, type, options, placeholder
       </Uebersicht.React.Fragment>
     )
   }
+  if (type === 'number') {
+    return (
+      <Uebersicht.React.Fragment>
+        <label htmlFor={code}>{label}</label>
+        <input
+          id={code}
+          type="number"
+          value={defaultValue}
+          placeholder={placeholder}
+          onChange={onChange}
+          autoComplete="off"
+        />
+      </Uebersicht.React.Fragment>
+    )
+  }
   if (type === 'textarea') {
     return (
       <Uebersicht.React.Fragment>
@@ -89,37 +104,55 @@ const getLastCurrentTab = () => {
   return 0
 }
 
-export const Component = () => {
+export const Wrapper = () => {
   const [visible, setVisible] = Uebersicht.React.useState(false)
-  const [currentTab, setCurrentTab] = Uebersicht.React.useState(getLastCurrentTab())
-  const [pendingChanges, setPendingChanges] = Uebersicht.React.useState(0)
-  const settings = Settings.get()
-  const [newSettings, setNewSettings] = Uebersicht.React.useState(settings)
 
-  const closeSettings = () => setVisible(false)
+  const closeSettings = () => {
+    setVisible(false)
+    Utils.blurBar()
+  }
 
   const onKeydown = Uebersicht.React.useCallback((e) => {
     const { ctrlKey, keyCode, metaKey, which } = e
-    if ((ctrlKey || metaKey) && (which === 84 || keyCode === 84)) {
-      e.preventDefault()
-      const AUTO = 'auto'
-      const DARK = 'dark'
-      const LIGHT = 'light'
-      const newValue = newSettings.global.theme === AUTO ? AUTO : newSettings.global.theme === LIGHT ? DARK : LIGHT
-      Uebersicht.run(
-        `osascript -e 'tell app "System Events" to tell appearance preferences to set dark mode to not dark mode'`
-      )
-      if (newValue !== AUTO) {
-        const updatedSettings = { ...newSettings, global: { ...newSettings.global, theme: newValue } }
-        Settings.set(updatedSettings)
-        Utils.hardRefresh()
-      }
-    }
     if ((ctrlKey || metaKey) && (which === 188 || keyCode === 188)) {
       e.preventDefault()
       setVisible(true)
     }
+    if ((ctrlKey || metaKey) && (which === 84 || keyCode === 84)) {
+      const settings = Settings.get()
+      e.preventDefault()
+      const AUTO = 'auto'
+      const DARK = 'dark'
+      const LIGHT = 'light'
+      const newValue = settings.global.theme === AUTO ? AUTO : settings.global.theme === LIGHT ? DARK : LIGHT
+      Uebersicht.run(
+        `osascript -e 'tell app "System Events" to tell appearance preferences to set dark mode to not dark mode'`
+      )
+      if (newValue !== AUTO) {
+        const updatedSettings = { ...settings, global: { ...settings.global, theme: newValue } }
+        Settings.set(updatedSettings)
+        Utils.hardRefresh()
+      }
+    }
   }, [])
+
+  Uebersicht.React.useEffect(() => {
+    document.addEventListener('keydown', onKeydown)
+    return () => document.removeEventListener('keydown', onKeydown)
+  }, [])
+
+  return (
+    <Uebersicht.React.Fragment>
+      {visible && <Component visible={visible} closeSettings={closeSettings} />}
+    </Uebersicht.React.Fragment>
+  )
+}
+
+export const Component = ({ closeSettings }) => {
+  const [currentTab, setCurrentTab] = Uebersicht.React.useState(getLastCurrentTab())
+  const [pendingChanges, setPendingChanges] = Uebersicht.React.useState(0)
+  const settings = Settings.get()
+  const [newSettings, setNewSettings] = Uebersicht.React.useState(settings)
 
   const onTabClick = (tab) => {
     setCurrentTab(tab)
@@ -146,7 +179,7 @@ export const Component = () => {
   const onExportClick = async () => {
     const { externalConfigFile } = newSettings.global
     if (externalConfigFile) {
-      await Uebersicht.run(`echo '${JSON.stringify(newSettings)}' | tee ${EXTERNAL_CONFIG_FILE_PATH}`)
+      await Uebersicht.run(`echo '${JSON.stringify(newSettings).replace(/'/g, "'\"'\"'")}' | tee ${EXTERNAL_CONFIG_FILE_PATH}`)
     }
   }
 
@@ -156,15 +189,8 @@ export const Component = () => {
     setPendingChanges(deepDiffs.length)
   }, [newSettings])
 
-  Uebersicht.React.useEffect(() => {
-    document.addEventListener('keydown', onKeydown)
-    return () => document.removeEventListener('keydown', onKeydown)
-  }, [])
-
-  const classes = Utils.classnames('settings', { 'settings--visible': visible })
-
   return (
-    <div className={classes}>
+    <div className="settings">
       <div className="settings__overlay" onClick={closeSettings} />
       <div className="settings__outer">
         <div className="settings__header">
@@ -203,7 +229,7 @@ export const Component = () => {
                   const defaultValue = newSettings[key][subKey]
                   const classes = Utils.classnames('settings__item', {
                     'settings__item--radio': type === 'radio',
-                    'settings__item--text': type === 'text',
+                    'settings__item--text': type === 'text' || type === 'number',
                     'settings__item--textarea': type === 'textarea',
                     'settings__item--full-width': fullWidth
                   })

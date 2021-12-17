@@ -1,7 +1,7 @@
 import * as Uebersicht from 'uebersicht'
 import * as DataWidget from './data-widget.jsx'
 import * as DataWidgetLoader from './data-widget-loader.jsx'
-import * as Specter from './specter.jsx'
+
 import * as Icons from '../icons.jsx'
 import * as Settings from '../../settings'
 import * as Utils from '../../utils'
@@ -9,7 +9,13 @@ import useWidgetRefresh from '../../hooks/use-widget-refresh'
 
 export { spotifyStyles as styles } from '../../styles/components/data/spotify'
 
-const refreshFrequency = 10000
+const settings = Settings.get()
+const { widgets, spotifyWidgetOptions } = settings
+const { spotifyWidget } = widgets
+const { refreshFrequency, showSpecter } = spotifyWidgetOptions
+
+const DEFAULT_REFRESH_FREQUENCY = 10000
+const REFRESH_FREQUENCY = Settings.getRefreshFrequency(refreshFrequency, DEFAULT_REFRESH_FREQUENCY)
 
 const togglePlay = (isPaused) => {
   const state = isPaused ? 'play' : 'pause'
@@ -22,22 +28,21 @@ const getIcon = (playerState) => {
   return Icons.Paused
 }
 
-const settings = Settings.get()
-
 export const Widget = () => {
-  const ref = Uebersicht.React.useRef()
-  const { widgets, spotifyWidgetOptions } = settings
-  const { spotifyWidget } = widgets
-
   const [state, setState] = Uebersicht.React.useState()
   const [loading, setLoading] = Uebersicht.React.useState(spotifyWidget)
 
   const getSpotify = async () => {
     const isRunning = await Uebersicht.run(
-      `osascript -e 'tell application "System Events" to (name of processes) contains "Spotify"' 2>&1`
+      `ps aux | grep -v 'grep' | grep -q '[S]potify Helper' && echo "true" || echo "false"`
     )
     if (Utils.cleanupOutput(isRunning) === 'false') {
       setLoading(false)
+      setState({
+        playerState: '',
+        trackName: '',
+        artistName: ''
+      })
       return
     }
     const [playerState, trackName, artistName] = await Promise.all([
@@ -59,12 +64,11 @@ export const Widget = () => {
     setLoading(false)
   }
 
-  useWidgetRefresh(spotifyWidget, getSpotify, refreshFrequency)
+  useWidgetRefresh(spotifyWidget, getSpotify, REFRESH_FREQUENCY)
 
   if (loading) return <DataWidgetLoader.Widget className="spotify" />
   if (!state) return null
   const { playerState, trackName, artistName } = state
-  const { showSpecter } = spotifyWidgetOptions
 
   if (!trackName.length) return null
 
@@ -88,26 +92,18 @@ export const Widget = () => {
     getSpotify()
   }
 
-  const onMouseEnter = () => Utils.startSliding(ref.current, '.spotify__inner', '.spotify__slider')
-  const onMouseLeave = () => Utils.stopSliding(ref.current, '.spotify__slider')
-
   const classes = Utils.classnames('spotify', { 'spotify--playing': isPlaying })
 
   return (
     <DataWidget.Widget
-      ref={ref}
       classes={classes}
       Icon={Icon}
       onClick={onClick}
       onRightClick={onRightClick}
       onMiddleClick={onMiddleClick}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
+      showSpecter={showSpecter && isPlaying}
     >
-      {showSpecter && isPlaying && <Specter.Widget />}
-      <div className="spotify__inner">
-        <div className="spotify__slider">{label}</div>
-      </div>
+      {label}
     </DataWidget.Widget>
   )
 }
