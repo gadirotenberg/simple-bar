@@ -1,8 +1,8 @@
 # simple-bar
 
-A [yabai](https://github.com/koekeishiya/yabai) status bar widget for [Übersicht](https://github.com/felixhageloh/uebersicht) inspired by [nibar](https://github.com/kkga/nibar), [yabar](https://github.com/AlexNaga/yabar) and [this reddit post](https://www.reddit.com/r/unixporn/comments/chwk89/yabai_yabai_and_gruvbox_with_custom_ubersicht_bar/). Visit **simple-bar** website [here](https://www.simple-bar.com/en/).
+A [yabai](https://github.com/koekeishiya/yabai) status bar widget for [Übersicht](https://github.com/felixhageloh/uebersicht) inspired by [nibar](https://github.com/kkga/nibar), [yabar](https://github.com/AlexNaga/yabar) and [this reddit post](https://www.reddit.com/r/unixporn/comments/chwk89/yabai_yabai_and_gruvbox_with_custom_ubersicht_bar/).
 
-Developed by [Jean Tinland](https://www.jeantinland.com).
+A more "lite" & less ressource greedy version is available [here](https://github.com/Jean-Tinland/simple-bar-lite).
 
 ## Features
 
@@ -21,7 +21,7 @@ Developed by [Jean Tinland](https://www.jeantinland.com).
 - You can add your own custom widgets in settings (1)
 - **Only with SIP disabled**: create new workspace on "+" click, move or destroy workspace on space hover
 
-(1) Settings can be opened by pressing `cmd + ,` after cliking on **simple-bar** widget. More details in [Settings](#settings) section.\
+(1) Settings can be opened by pressing `cmd + ,` after clicking on **simple-bar** widget. More details in [Settings](#settings) section.\
 (2) Press `cmd + t` while focusing **simple-bar** (a light blue border should be visible at this moment).\
 (3) Currently supported: Google Chrome (YouTube & Spotify for browser), Brave (YouTube & Spotify for browser), Safari (YouTube) & Firefox (YouTube).\
 (4) You'll be prompted to let Übersicht use you geolocation.
@@ -156,6 +156,7 @@ You can use the **Übersicht debug console** in order to inspect the widgets com
 - Pywal integration was added thanks to [@Amar1729](https://github.com/Amar1729)
 - Wifi toggle on click also added thanks to [@Amar1729](https://github.com/Amar1729)
 - Crypto widget added thanks to [@yorhodes](https://github.com/yorhodes)
+- Stocks widget added thanks to [@ZhongXiLu](https://github.com/ZhongXiLu)
 - Spotify current track & play/pause toggle on click and Dracula theme adaptation added thanks to [@jamieweavis](https://github.com/jamieweavis)
 - Sticky windows workaround & several sticky windows options in settins added thanks to [@kvndrsslr](https://github.com/kvndrsslr)
 - Right & middle click actions in Spotify, Wifi & all user widgets added thanks to [@rosenpin](https://github.com/rosenpin)
